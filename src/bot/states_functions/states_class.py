@@ -10,4 +10,4 @@ class Form(StatesGroup):
     main = State()
 
 
-Settings['Form'] = Form
+Settings.Form = Form
