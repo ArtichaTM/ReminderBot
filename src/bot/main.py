@@ -1,5 +1,4 @@
 import asyncio
-import tracemalloc
 import sys
 
 from aiogram import Bot, Dispatcher
@@ -22,8 +21,9 @@ def run() -> None:
     if len(args) < 1:
         raise RuntimeError('To run server, pass token as first argument')
     token = args[0]
-    # tracemalloc.start()
     try:
-        asyncio.run(main(token))
+        loop = asyncio.new_event_loop()
+        Settings.loop = loop
+        loop.run_until_complete(main(token))
     except TokenValidationError as e:
         raise TokenValidationError('Token is invalid') from e
