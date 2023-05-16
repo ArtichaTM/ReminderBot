@@ -1,4 +1,5 @@
 from typing import Optional, Self
+from pathlib import Path
 from sqlite3 import connect
 from sqlite3 import Cursor as SQLCursor
 from datetime import datetime, timedelta
@@ -32,7 +33,9 @@ class Cursor:
 class Database:
     __slots__ = ('db', 'async_loop')
 
-    def __init__(self, path: str):
+    def __init__(self, path: str | Path):
+        if isinstance(path, Path):
+            path = path.absolute()
         self.db = connect(path)
 
         with self.cursor() as cur:
