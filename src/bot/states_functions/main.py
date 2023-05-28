@@ -5,10 +5,17 @@ from aiogram import Dispatcher
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import ReplyKeyboardMarkup, KeyboardButton
 
 from ..settings import Settings
-from .states_class import Form
+
+
+class Form(StatesGroup):
+    main = State()
+
+
+Settings.Form = Form
 
 
 form_router: Dispatcher = Settings.Dispatcher
