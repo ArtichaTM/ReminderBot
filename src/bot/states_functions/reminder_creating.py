@@ -1,4 +1,5 @@
 import asyncio
+import sqlite3
 from datetime import datetime, timedelta
 from io import StringIO
 from typing import Optional, List
@@ -188,18 +189,36 @@ async def read_date(message: Message, state: FSMContext) -> None:
 
 @form_router.message(NewReminderStates.text_date)
 async def text_date(message: Message, state: FSMContext) -> None:
-    date = (await state.get_data()).get('date')
+    date: datetime = (await state.get_data()).get('date')
     assert date is not None
 
     if len(message.text) > 2000:
         await message.answer("Слишком много символов")
         await read_date(message=message, state=state)
 
-    reminder = await ReminderDB.new()
-    reminder.datetime = date
-    reminder.text = message.text
-    reminder.owner = message.from_user.id
-    await reminder.commit()
+    db = Settings.Database
+    with db.cursor() as cur:
+        cur: sqlite3.Cursor
+        reminder: tuple = cur.execute(
+            "SELECT ROWID, owner, datetime, text FROM reminds "
+            f"WHERE OWNER=? and datetime=?",
+            (message.from_user.id, int(date.timestamp()))
+        ).fetchone()
+
+    if reminder:
+        reminder: list = list(reminder)
+        reminder[2] = datetime.fromtimestamp(
+            reminder[2], tz=Settings.timezone
+        )
+        reminder = await ReminderDB.assert_existing(*reminder)
+        reminder.text += f"\n---\n{message.text}"
+        await reminder.commit()
+    else:
+        reminder: ReminderDB = await ReminderDB.new()
+        reminder.datetime = date
+        reminder.text = message.text
+        reminder.owner = message.from_user.id
+        await reminder.commit()
 
     await message.answer(
         f"Напоминание на {date.day} {Settings.months[date.month]}"
@@ -265,7 +284,10 @@ async def read_pair(message: Message, state: FSMContext) -> None:
     output.write(
         f'Выбрал датой {date:%d.%m.%y %H:%M}. '
         'Введите текст напоминания, '
-        'или командой /cancel вернитесь в меню'
+        'или командой /cancel вернитесь в меню\n'
+        'DEBUG информация:\n'
+        f'Похоже на фразу "{expecting_string}", '
+        f'схожесть {ratio}'
     )
     await message.answer(output.getvalue())
     await state.set_state(NewReminderStates.text_date)
