@@ -176,8 +176,7 @@ async def text_date(message: Message, state: FSMContext) -> None:
         await message.answer("Слишком много символов")
         await read_date(message=message, state=state)
 
-    from ..db import Reminder
-    reminder = await Reminder.new()
+    reminder = await ReminderDB.new()
     reminder.datetime = date
     reminder.text = message.text
     reminder.owner = message.from_user.id
