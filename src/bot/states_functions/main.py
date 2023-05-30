@@ -29,7 +29,7 @@ async def start(message: Message, state: FSMContext) -> None:
         answer,
         reply_markup=ReplyKeyboardMarkup(keyboard=[[
             KeyboardButton(text='Создать напоминание'),
-            # KeyboardButton(text='Просмотреть напоминания'),
+            KeyboardButton(text='Просмотреть напоминания'),
         ]], resize_keyboard=True)
     )
     await state.set_state(Form.main)
