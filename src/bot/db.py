@@ -57,9 +57,14 @@ class Database:
         return Cursor(db=self, autocommit=autocommit)
 
     async def unload_instance(self) -> None:
+        self.unload_instance_normal()
+
+    def unload_instance_normal(self) -> None:
+        if self.db is None:
+            return
         self.db.commit()
         self.db.close()
-
+        self.db = None
 
 class Reminder:
     __slots__ = ('id', '_loaded',
@@ -165,4 +170,3 @@ class Reminder:
 
 
 Settings.DB_Reminder = Reminder
-

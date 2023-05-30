@@ -61,3 +61,5 @@ def run() -> None:
         loop.run_until_complete(main(token))
     except TokenValidationError as e:
         raise TokenValidationError('Token is invalid') from e
+    except KeyboardInterrupt:
+        Settings.Database.unload_instance_normal()
