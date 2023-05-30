@@ -5,3 +5,6 @@ ROOT = Path(__file__).parent
 DATA_FOLDER = ROOT / 'data'
 
 DB_REMINDS = DATA_FOLDER / 'reminds.db'
+
+
+DATA_FOLDER.mkdir(exist_ok=True)
