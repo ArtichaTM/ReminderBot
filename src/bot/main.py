@@ -1,5 +1,6 @@
 import asyncio
 import sys
+# import tracemalloc
 
 from aiogram import Bot, Dispatcher
 from aiogram.utils.token import TokenValidationError
@@ -58,6 +59,7 @@ def run() -> None:
     try:
         loop = asyncio.new_event_loop()
         Settings.loop = loop
+        # tracemalloc.start()
         loop.run_until_complete(main(token))
     except TokenValidationError as e:
         raise TokenValidationError('Token is invalid') from e
